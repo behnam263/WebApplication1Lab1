@@ -1,4 +1,7 @@
 var readlineSync = require('readline-sync');
+var Tasklist=[];
+main();
+let menuinterval = setInterval(()=>{Menu()},500);
 
 var Task ={
     Description:"description",
@@ -6,24 +9,19 @@ var Task ={
     private:false,
     deadline:Date()
 }
-main();
-var Tasklist=[];
+
+
 
 function main(){
-
  Tasklist= sampleData();
 seperator("Excercise one");
 string_split();
-seperator("menu");
-while  (Menu())
-     seperator("Return to menu");
 
 }
 
-
  function Menu()
  { 
-
+    seperator("menu");
     let isbringMenu=true;
  console.log('1. Insert a new task');
  console.log('2. Remove a task');
@@ -46,6 +44,7 @@ while  (Menu())
     case "4":
         console.log('Bye');
         isbringMenu=false;
+        clearInterval(menuinterval);
     break;
  }
  return isbringMenu;
@@ -61,15 +60,15 @@ let choice = readlineSync.question('ُCan you type a description:');
          Task2.private=true;
          let datestr=readlineSync.question('ُcan you type the date? [year-mm-dd]:') ;
          try {
-           let date= Date.parse(datestr) ;
-           Task2.data=date;
-           timeoutTask(Task2);
+           Task2.deadline=Date.parse(datestr);
+          
          }
          catch
          {
             console.log("problem in converting date");
          }
          Tasklist.push(Task2);
+          timeoutTask(Task2);
 }
 
 function string_split()
@@ -86,6 +85,7 @@ function seperator (Sectionname)
 }
 function showTaskList()
 {
+    console.log(Tasklist)
     let taskListSorted=Tasklist.sort(compare);
     for (task of taskListSorted)
     { 
@@ -93,7 +93,7 @@ function showTaskList()
     console.log(" Task Description: "+task.Description);
      console.log(" Task is Urgent?: "+task.Urgent);
      console.log(" Task is private?: "+task.private);
-     console.log(" Task is date: "+(new Date(task.data)).toUTCString());
+     console.log(" Task is date: "+(new Date(task.deadline)).toUTCString());
      console.log("************************************");
     }
 }
@@ -107,15 +107,15 @@ function DeleteTask()
     }
     else if (choice=="2"){
         choice = readlineSync.question('ُType the date of Task to delete [year-mm-dd]:');
-        let date= Date.parse(choice) ;
+        let date= new Date(choice) ;
         return  Tasklist.splice(Tasklist.findIndex(value=>value.date==choice),1);
     }
     else if (choice=="3"){
         choice = readlineSync.question('ُType the date of Task to delete history [year-mm-dd]:');
-        let date= Date.parse(choice) ;
+        let date= new Date(choice) ;
         for (taskindex of Tasklist.findIndex(value=>value.date<date))
         Tasklist.splice(taskindex,1);
-          
+         
     }
 }
 
@@ -125,17 +125,18 @@ function sampleData(){
     Task2.Description="test";
     Task2.Urgent=true;
     Task2.private=true;
-    Task2.date= Date.parse("2020-03-20") ;
-    timeoutTask(Task2);
-     tasklistsample.push(Task2);
+    Task2.deadline= new Date("2020-03-20T15:35:00");
+     tasklistsample.push(Task2); 
+     timeoutTask(Task2);
 
     let Task3=Object.assign({},Task);
     Task3.Description="besttest";
     Task3.Urgent=true;
     Task3.private=true;
-    Task3.date= Date.parse("2020-03-21") ;
-    timeoutTask(Task3);
+    Task3.deadline= new Date("2020-03-20T15:40:00") ;
      tasklistsample.push(Task3);
+     timeoutTask(Task3);
+
     return tasklistsample;
 }
 function compare( a, b ) {
@@ -150,11 +151,17 @@ function compare( a, b ) {
 
   function timeoutTask(inputTask)
   {
+    
     let d1 = new Date();
-    let d2 = new Date(inputTask.date);
-    let bigger = d1.getTime() > d2.getTime();
-if (bigger)
+    let d2 = inputTask.deadline;
+    let difference =d2.getTime()-d1.getTime();
+    console.log(d1.toLocaleString('en-GB', { timeZone: 'UTC' }));
+    console.log(d2.toLocaleString('en-GB', { timeZone: 'UTC' }));
+    
+    console.log(difference);
+if (difference>0)
  setTimeout(()=>{
+     console.log("called timout" + (new Date()).toString());
         Tasklist.splice(Tasklist.findIndex(value=>value==inputTask));
-  }, inputTask.date-(new Date()));
+  }, difference);
 }
