@@ -85,7 +85,6 @@ function seperator (Sectionname)
 }
 function showTaskList()
 {
-    console.log(Tasklist)
     let taskListSorted=Tasklist.sort(compare);
     for (task of taskListSorted)
     { 
@@ -161,7 +160,6 @@ function compare( a, b ) {
     console.log(difference);
 if (difference>0)
  setTimeout(()=>{
-     console.log("called timout" + (new Date()).toString());
-        Tasklist.splice(Tasklist.findIndex(value=>value==inputTask));
+        Tasklist.splice(Tasklist.findIndex(value=>value.Description==inputTask.Description));
   }, difference);
 }
